@@ -1,0 +1,34 @@
+{
+  "name": "hapi-response-meta",
+  "version": "0.1.0",
+  "description": "Adds meta to hapi response",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/developmentseed/hapi-response-meta.git"
+  },
+  "keywords": [
+    "Hapi",
+    "meta"
+  ],
+  "author": "Develompent Seed",
+  "license": "CC0-1.0",
+  "bugs": {
+    "url": "https://github.com/developmentseed/hapi-response-meta/issues"
+  },
+  "homepage": "https://github.com/developmentseed/hapi-response-meta#readme",
+  "dependencies": {
+    "lodash": "^3.9.3"
+  },
+  "devDependencies": {
+    "chai": "^3.0.0",
+    "hapi": "^8.6.0",
+    "mocha": "^2.2.5"
+  },
+  "engines": {
+    "node": ">=0.10.32"
+  }
+}
