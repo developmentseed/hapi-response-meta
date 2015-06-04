@@ -1,9 +1,17 @@
 language: node_js
 node_js:
-  - '0.12'
+- '0.12'
 branches:
   only:
-    - master
-    - develop
+  - master
+  - develop
 script:
-  - npm test
+- npm test
+deploy:
+  provider: npm
+  email: dev@developmentseed.org
+  api_key:
+    secure: s02xOU/cRBYzWiee322JqZQBXtHrNXqArtnohVM1EdC5tVhUAj7jx3KOLlNvZoXPOY0ytdZY/FSKwu3lz9qkQDxYnDlkVrLtukc3fSU1qfbU7lefCbMSuIY1uFBmtmjvU3ktovCgyA5GIfCNzGIxC+rzi7CwCU/cN98D1XjrSrOOqVOW9kjPpEkAH1RAYgKxoFVfZClgNgB1VSGuwfYn8pCafb33DpXvN/6CmEEC4zCEV5zxrH4xhktYYFm6KRlOAInMXsKnQeBWIRwD1uqPFPSEZbT190MyFaiELI/kZ6AFs6YDfV+MA9I6bW3Ekc1jbnWbq8TJ+FsMsw++dpvPKhHcHGOwSEqaw/S7j+ztWf4DzeBdeqQwVtOaroA6SFOlIJ1nLpL3XCmVwZsYjgA0qOXYOdpzwEUXtwNlX5VcvDOMN8urG1f74FT0eChu7Ioy3eG8EU0K+7oIGqZtPNce3InqE+AFFD0aFUku2wOGanRyXZrAbss/LYcTsk7EJN6YIcgmIP6MGdGg6LRIRzVKkQsuBvnhA/Hhon2ZcZ4eF+q2M6ipIpMQcf7/UrE0v4XzMyHg/XVdnOWBkFcm41BXvJ7fjgRwMeQ1VFwDftEVIueJr9jrF5HVFtHqs5DzL9MiZ/P1JvU7DpuhnjnerpILreVw3jqAygE0b0oyld5Tt6I=
+  on:
+    repo: developmentseed/hapi-response-meta
+    branch: master
