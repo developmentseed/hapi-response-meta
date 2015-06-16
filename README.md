@@ -25,7 +25,8 @@ hapi.register({
         provided_by: 'Some Organization',
         site: 'example.com'
     },
-    results: 'results'
+    results: 'results',
+    routes: ['/', '/api']
   }
 };
 ```

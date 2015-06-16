@@ -1,6 +1,6 @@
 {
   "name": "hapi-response-meta",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Adds meta to hapi response",
   "main": "index.js",
   "scripts": {
@@ -26,7 +26,8 @@
   "devDependencies": {
     "chai": "^3.0.0",
     "hapi": "^8.6.0",
-    "mocha": "^2.2.5"
+    "mocha": "^2.2.5",
+    "step": "0.0.5"
   },
   "engines": {
     "node": ">=0.10.32"
