@@ -3,6 +3,7 @@
 
 var Hapi = require('hapi');
 var expect = require('chai').expect;
+var Step = require('step');
 
 var register = function () {
   var server = new Hapi.Server();
@@ -86,6 +87,80 @@ describe('Test hapi-response-meta', function () {
         expect(res.result.meta).to.have.all.keys(['license', 'website', 'page', 'limit']);
         done();
       });
+    });
+  });
+
+  it('test route option', function (done) {
+    var server = register();
+
+    var output = {
+      meta: {
+        page: 1,
+        limit: 100
+      },
+      results: 'ok'
+    };
+
+    server.route({
+      method: 'GET',
+      path: '/with',
+      handler: function (request, reply) {
+        return reply(output);
+      }
+    });
+    server.route({
+      method: 'GET',
+      path: '/without',
+      handler: function (request, reply) {
+        return reply({this: 'that'});
+      }
+    });
+    server.route({
+      method: 'GET',
+      path: '/with_meta',
+      handler: function (request, reply) {
+        return reply({
+          meta: {
+            important: 'yes'
+          },
+          results: {
+            this: 'that'
+          }
+        });
+      }
+    });
+    server.register({
+      register: require('../'),
+      options: {
+        content: {
+          license: 'Some license',
+          website: 'example.com'
+        },
+        routes: ['/with']
+      }
+    }, function (err) {
+      expect(err).to.be.empty;
+
+      Step(
+        function withGet () {
+          var request = { method: 'GET', url: '/with'};
+          server.inject(request, this);
+        },
+        function without (res) {
+          expect(res.result.meta).to.contain.all.keys('license', 'website');
+          var request = { method: 'GET', url: '/without'};
+          server.inject(request, this);
+        },
+        function withMeta (res) {
+          expect(res.result).to.not.have.any.keys('meta');
+          var request = { method: 'GET', url: '/with_meta'};
+          server.inject(request, this);
+        },
+        function withMeta (res) {
+          expect(res.result.meta).to.not.have.any.keys('license', 'website');
+          done();
+        }
+      );
     });
   });
 });
