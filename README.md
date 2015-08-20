@@ -26,7 +26,8 @@ hapi.register({
         site: 'example.com'
     },
     results: 'results',
-    routes: ['/', '/api']
+    routes: ['/', '/api'],
+    excludeFormats: ['csv']
   }
 };
 ```
