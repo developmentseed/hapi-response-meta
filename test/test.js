@@ -163,4 +163,27 @@ describe('Test hapi-response-meta', function () {
       );
     });
   });
+
+  it('test exclude option', function (done) {
+    var server = register();
+    var plugin = {
+      register: require('../'),
+      options: {
+        content: {
+          license: 'Some license',
+          website: 'example.com'
+        },
+        excludeFormats: ['csv']
+      }
+    };
+    server.register(plugin, function (err) {
+      expect(err).to.be.empty;
+
+      var request = { method: 'GET', url: '/?format=csv'};
+      server.inject(request, function (res) {
+        expect(res.result).to.equal('ok');
+        done();
+      });
+    });
+  });
 });
