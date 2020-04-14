@@ -1,37 +1,32 @@
 /* global require, describe, it, before */
 'use strict';
 
-var Hapi = require('hapi');
-var expect = require('chai').expect;
-var Step = require('step');
+const Hapi = require('@hapi/hapi');
+const expect = require('chai').expect;
 
-var register = function () {
-  var server = new Hapi.Server();
-  server.connection();
-  server.route({ method: 'GET', path: '/', handler: function (request, reply) { return reply('ok'); }});
+const register = function () {
+  const server = new Hapi.Server();
+  server.route({ method: 'GET', path: '/', handler: function (request, h) { return 'ok'; }});
 
   return server;
 };
 
 describe('Test hapi-response-meta', function () {
-  it('test if meta is added to response', function (done) {
-    var server = register();
-    server.register(require('../'), function (err) {
-      expect(err).to.be.empty;
+  it('test if meta is added to response', async function(done) {
+    const server = register();
+    await server.register(require('../'));
 
-      var request = { method: 'GET', url: '/'};
-      server.inject(request, function (res) {
-        expect(res.result).to.have.all.keys(['meta', 'results']);
-        done();
-      });
-    });
+    const request = { method: 'GET', url: '/'};
+    let res = await server.inject(request);
+    expect(res.result).to.have.all.keys(['meta', 'results']);
+    done();
   });
 
-  it('test options', function (done) {
-    var server = register();
+  it('test options', async function (done) {
+    const server = register();
 
-    var plugin = {
-      register: require('../'),
+    const plugin = {
+      plugin: require('../'),
       options: {
         key: 'NewMeta',
         content: {
@@ -42,24 +37,21 @@ describe('Test hapi-response-meta', function () {
       }
     };
 
-    server.register(plugin, function (err) {
-      expect(err).to.be.empty;
+    await server.register(plugin);
 
-      var request = { method: 'GET', url: '/'};
-      server.inject(request, function (res) {
-        expect(res.result).to.have.all.keys(['NewMeta', 'output']);
-        expect(res.result.NewMeta).to.have.all.keys(['license', 'website']);
-        expect(res.result.NewMeta.website).to.equal('example.com');
-        expect(res.result.NewMeta.license).to.equal('Some license');
-        done();
-      });
-    });
+    const request = { method: 'GET', url: '/'};
+    let res = await server.inject(request)
+    expect(res.result).to.have.all.keys(['NewMeta', 'output']);
+    expect(res.result.NewMeta).to.have.all.keys(['license', 'website']);
+    expect(res.result.NewMeta.website).to.equal('example.com');
+    expect(res.result.NewMeta.license).to.equal('Some license');
+    done();
   });
 
-  it('test when meta is already present', function (done) {
-    var server = register();
+  it('test when meta is already present', async function (done) {
+    const server = register();
 
-    var output = {
+    const output = {
       meta: {
         page: 1,
         limit: 100
@@ -67,10 +59,10 @@ describe('Test hapi-response-meta', function () {
       results: 'ok'
     };
 
-    server.route({ method: 'GET', path: '/new', handler: function (request, reply) { return reply(output); }});
+    server.route({ method: 'GET', path: '/new', handler: function (request, h) { return output; }});
 
-    var plugin = {
-      register: require('../'),
+    const plugin = {
+      plugin: require('../'),
       options: {
         content: {
           license: 'Some license',
@@ -79,21 +71,18 @@ describe('Test hapi-response-meta', function () {
       }
     };
 
-    server.register(plugin, function (err) {
-      expect(err).to.be.empty;
+    await server.register(plugin);
 
-      var request = { method: 'GET', url: '/new'};
-      server.inject(request, function (res) {
-        expect(res.result.meta).to.have.all.keys(['license', 'website', 'page', 'limit']);
-        done();
-      });
-    });
+    const request = { method: 'GET', url: '/new'};
+    const res = await server.inject(request);
+    expect(res.result.meta).to.have.all.keys(['license', 'website', 'page', 'limit']);
+    done();
   });
 
-  it('test route option', function (done) {
-    var server = register();
+  it('test route option', async function (done) {
+    const server = register();
 
-    var output = {
+    const output = {
       meta: {
         page: 1,
         limit: 100
@@ -104,33 +93,33 @@ describe('Test hapi-response-meta', function () {
     server.route({
       method: 'GET',
       path: '/with',
-      handler: function (request, reply) {
-        return reply(output);
+      handler: function (request, h) {
+        return output;
       }
     });
     server.route({
       method: 'GET',
       path: '/without',
-      handler: function (request, reply) {
-        return reply({this: 'that'});
+      handler: function (request, h) {
+        return {this: 'that'};
       }
     });
     server.route({
       method: 'GET',
       path: '/with_meta',
-      handler: function (request, reply) {
-        return reply({
+      handler: function (request, h) {
+        return {
           meta: {
             important: 'yes'
           },
           results: {
             this: 'that'
           }
-        });
+        };
       }
     });
-    server.register({
-      register: require('../'),
+    await server.register({
+      plugin: require('../'),
       options: {
         content: {
           license: 'Some license',
@@ -138,36 +127,26 @@ describe('Test hapi-response-meta', function () {
         },
         routes: ['/with']
       }
-    }, function (err) {
-      expect(err).to.be.empty;
+    })
 
-      Step(
-        function withGet () {
-          var request = { method: 'GET', url: '/with'};
-          server.inject(request, this);
-        },
-        function without (res) {
-          expect(res.result.meta).to.contain.all.keys('license', 'website');
-          var request = { method: 'GET', url: '/without'};
-          server.inject(request, this);
-        },
-        function withMeta (res) {
-          expect(res.result).to.not.have.any.keys('meta');
-          var request = { method: 'GET', url: '/with_meta'};
-          server.inject(request, this);
-        },
-        function withMeta (res) {
-          expect(res.result.meta).to.not.have.any.keys('license', 'website');
-          done();
-        }
-      );
-    });
+    var request = { method: 'GET', url: '/with'};
+    var res = await server.inject(request);
+    expect(res.result.meta).to.contain.all.keys('license', 'website');
+
+    request = { method: 'GET', url: '/without'};
+    res = await server.inject(request);
+    expect(res.result).to.not.have.any.keys('meta');
+
+    request = { method: 'GET', url: '/with_meta'};
+    res = await server.inject(request);
+    expect(res.result.meta).to.not.have.any.keys('license', 'website');
+    done();
   });
 
-  it('test exclude option', function (done) {
-    var server = register();
-    var plugin = {
-      register: require('../'),
+  it('test exclude option', async function (done) {
+    const server = register();
+    const plugin = {
+      plugin: require('../'),
       options: {
         content: {
           license: 'Some license',
@@ -176,14 +155,11 @@ describe('Test hapi-response-meta', function () {
         excludeFormats: ['csv']
       }
     };
-    server.register(plugin, function (err) {
-      expect(err).to.be.empty;
+    await server.register(plugin);
 
-      var request = { method: 'GET', url: '/?format=csv'};
-      server.inject(request, function (res) {
-        expect(res.result).to.equal('ok');
-        done();
-      });
-    });
+    const request = { method: 'GET', url: '/?format=csv'};
+    const res = await server.inject(request);
+    expect(res.result).to.equal('ok');
+    done();
   });
 });

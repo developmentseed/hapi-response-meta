@@ -1,6 +1,6 @@
 {
   "name": "hapi-response-meta",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Adds meta to hapi response",
   "main": "index.js",
   "scripts": {
@@ -14,7 +14,7 @@
     "Hapi",
     "meta"
   ],
-  "author": "Develompent Seed",
+  "author": "Development Seed",
   "license": "CC0-1.0",
   "bugs": {
     "url": "https://github.com/developmentseed/hapi-response-meta/issues"
@@ -25,9 +25,8 @@
   },
   "devDependencies": {
     "chai": "^3.0.0",
-    "hapi": "^8.6.0",
-    "mocha": "^2.2.5",
-    "step": "0.0.5"
+    "@hapi/hapi": "^17.0.0",
+    "mocha": "^2.2.5"
   },
   "engines": {
     "node": ">=0.10.32"
