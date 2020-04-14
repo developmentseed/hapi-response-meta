@@ -15,10 +15,9 @@ This [Hapi](http://hapijs.com/) plugin adds metadata to a hapi response.
 var Hapi = require('hapi');
 
 var hapi = new Hapi.Server();
-hapi.connection();
 
 hapi.register({
-  register: require('hapi-response-meta'),
+  plugin: require('hapi-response-meta'),
   options: {
     key: 'meta',
     content: {
